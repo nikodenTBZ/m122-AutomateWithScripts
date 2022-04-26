@@ -1,7 +1,7 @@
 #Read the filecontent of the .data file split by ; into variables and print those variables into the console and save the different variables into a list
 fileLocation = "./files/raw/rechnung21003.data"
 
-def main(filename):
+def generateFilesWithContent(filename):
     invoice_txt = ""
     billFileRaw = open(filename, "r") #open file to read content
     lines = billFileRaw.readlines()
@@ -20,10 +20,10 @@ def main(filename):
     endcustomer = data[0]
     data.pop(0)
     
-    # print(overview)
-    # print(origin)
-    # print(endcustomer)
-    # print(data)
+    print(overview)
+    print(origin)
+    print(endcustomer)
+    print(data)
     
     # for pos in data:
     #     print(pos)
@@ -38,14 +38,6 @@ def main(filename):
     time = overview[4]
     pay_goal = overview[5]
     
-    print("Bill Name:\t" + bill_name)
-    print("Bill Number:\t" + bill_number)
-    print("Order Name:\t" + order_name)
-    print("Order Number:\t" + order_number)
-    print("Location:\t" + location)
-    print("Date:\t" + date)
-    print("Time:\t" + time)
-    print("Pay goal:\t" + pay_goal)
     
     origin_number = origin[1]
     sender_number = origin[2]
@@ -55,6 +47,20 @@ def main(filename):
     origin_vat_number = origin[6]
     origin_email = origin[7]
     
+    receiver_number = endcustomer[1]
+    customer_name = endcustomer[2]
+    customer_address = endcustomer[3]
+    customer_postcode = endcustomer[4]
+    
+    print("Bill Name:\t" + bill_name)
+    print("Bill Number:\t" + bill_number)
+    print("Order Name:\t" + order_name)
+    print("Order Number:\t" + order_number)
+    print("Location:\t" + location)
+    print("Date:\t" + date)
+    print("Time:\t" + time)
+    print("Pay goal:\t" + pay_goal)
+    
     print("Origin number:\t" + origin_number)
     print("Sender number:\t" + sender_number)
     print("Origin name:\t" + origin_name)
@@ -63,37 +69,30 @@ def main(filename):
     print("Origin vat number:\t" + origin_vat_number)
     print("Origin email:\t" + origin_email)
     
-    receiver_number = endcustomer[1]
-    customer_name = endcustomer[2]
-    customer_address = endcustomer[3]
-    customer_postcode = endcustomer[4]
-    
     print("Receiver number:\t" + receiver_number)
     print("Customer name:\t" + customer_name)
     print("Customer adress:\t" + customer_address)
     print("Customer postcode:\t" + customer_postcode)
-
-
     
     filePathTxtInvoice = "./files/bill_txt/" + sender_number +"_"+ bill_number + "_invoice.txt"
     filePathXmlInvoice = "./files/bill_xml/" + sender_number +"_"+ bill_number + "_invoice.xml"
     # print("filePathTxtInvoice", filePathTxtInvoice)
     # print("filePathXmlInvoice", filePathXmlInvoice)
     invoiceFileTxt = open(filePathTxtInvoice, "w")
-    invoiceFileTxt = open(filePathXmlInvoice, "w")
+    invoiceFileXml = open(filePathXmlInvoice, "w")
     # invoiceFileTxt = open(filePathTxtInvoice, "a", encoding='utf-8')
-    # invoiceFileTxt = open(filePathXmlInvoice, "a", encoding='utf-8')
+    # invoiceFileTxt = open(filePathXmlInvoice, "a", encoding='utf-8') 
     
     invoiceFileTxt.write("\n\n\n\n\n")
     invoiceFileTxt.write("\n")
-    invoiceFileTxt.write("" + origin_name + "\n")
-    invoiceFileTxt.write("" + origin_address + "\n")
-    invoiceFileTxt.write("" + origin_postcode + "\n")
+    invoiceFileTxt.write(origin_name + "\n")
+    invoiceFileTxt.write(origin_address + "\n")
+    invoiceFileTxt.write(origin_postcode + "\n")
     invoiceFileTxt.write("\n")
-    invoiceFileTxt.write("" + origin_vat_number + "\n")
+    invoiceFileTxt.write(origin_vat_number + "\n")
     invoiceFileTxt.write("\n\n\n\n\n")
-    
-    invoiceFileTxt.write(location + ", den " + date + "\t\t\t\t\t"+ customer_name +"\n")
+
+    invoiceFileTxt.write(location + ", den " + date + "\t\t\t"+ customer_name +"\n")
     invoiceFileTxt.write("\t\t\t\t\t\t\t\t" + customer_address + "\n")
     invoiceFileTxt.write("\t\t\t\t\t\t\t\t" + customer_postcode + "\n")
     invoiceFileTxt.write("\n")
@@ -102,7 +101,7 @@ def main(filename):
     invoiceFileTxt.write("Auftragsnummer:\t" + order_number + "\n")
     invoiceFileTxt.write("\n")
     invoiceFileTxt.write("Rechnung Nr\t" + bill_number + "\n")
-    invoiceFileTxt.write("-----------------------")
+    invoiceFileTxt.write("-----------------------\n")
     
     for d in data:
         bill_pos = d[1]
@@ -124,8 +123,9 @@ def main(filename):
     invoiceFileTxt.write("\n\n\n\n\n\n\n\n\n\n-----------")
     invoiceFileTxt.close()
     
-    #open and read the file after the appending:
-    f = open(filePathTxtInvoice, "r")
-    print(f.read()) 
-    
-main(fileLocation)
+# def readFile(filepath):
+#     f = open(filepath, "r")
+#     print(f.read())  
+#     f.close()
+
+generateFilesWithContent(fileLocation)
