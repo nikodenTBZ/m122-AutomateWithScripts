@@ -9,38 +9,31 @@ def send_bill_txt_and_bill_xml_to_email(bill_txt, bill_xml, email_address):
     Sends bill_txt and bill_xml to email_address.
     """
     import smtplib
-    from email.mime.multipart import MIMEMultipart
-    from email.mime.text import MIMEText
-    from email.mime.base import MIMEBase
-    from email import encoders
+    from email.message import EmailMessage
 
-    from_address = "nikoden@gmail.com"
-    to_address = email_address
-    subject = "Your bill from the internet"
-    body = "Your bill from the internet"
+    msg = EmailMessage()
+    msg["From"] = "Nikoden@gmail.com"
+    msg["Subject"] = "Bestätigung der Rechnung"
+    msg["To"] = email_address
+    msg.set_content("Hallo,\n\nIm Anhang befindet sich Ihre Rechnung.")
 
-    msg = MIMEMultipart()
-    msg['From'] = from_address
-    msg['To'] = to_address
-    msg['Subject'] = subject
-    msg.attach(MIMEText(body, 'plain'))
+    for directory in os.listdir("files"):
+        for file in os.listdir(f"files/{directory}"):
+            #Add file to email and check if it is xml or txt
+            if file.endswith(".txt"):
+                with open(f"files/{directory}/{file}", "rb") as f:
+                    file_data = f.read()
+                    file_name = file
+                    msg.add_attachment(file_data, maintype="text", subtype="plain", filename=file_name)
+            elif file.endswith(".xml"):
+                with open(f"files/{directory}/{file}", "rb") as f:
+                    file_data = f.read()
+                    file_name = file
+                    msg.add_attachment(file_data, maintype="text", subtype="xml", filename=file_name)
 
-    attach_file_name = bill_txt
-    attach_file = open(attach_file_name, 'rb')  # Open the file as binary mode
-    payload = MIMEBase('application', 'octate-stream')
-    payload.set_payload((attach_file).read())
-    encoders.encode_base64(payload)  # encode the attachment
-    # add payload header with filename
-    payload.add_header('Content-Decomposition', 'attachment', filename=attach_file_name)
-    msg.attach(payload)
-
-    # Create SMTP session for sending the mail
-    session = smtplib.SMTP('smtp.gmail.com', 587)  # use gmail with port
-    session.starttls()  # enable security
-    session.login(os.getenv("EMAIL_ADDRESS"), os.getenv("EMAIL_PASSWORD"))  # login with mail_id and password
-    text = msg.as_string()
-    session.sendmail(from_address, to_address, text)
-    session.quit()
-    print('Mail Sent to %s' % to_address)
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+        smtp.login(os.getenv("EMAIL_ADDRESS"), os.getenv("EMAIL_PASSWORD"))
+        smtp.send_message(msg)
+    print('Mail Sent to %s' % email_address)
 
 
