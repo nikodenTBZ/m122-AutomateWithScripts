@@ -71,7 +71,7 @@ def generateFilesWithContent(filename):
     
     print("Receiver number:\t" + receiver_number)
     print("Customer name:\t" + customer_name)
-    print("Customer adress:\t" + customer_address)
+    print("Customer address:\t" + customer_address)
     print("Customer postcode:\t" + customer_postcode)
     
     filePathTxtInvoice = "./files/bill_txt/" + sender_number +"_"+ bill_number + "_invoice.txt"
@@ -127,5 +127,3 @@ def generateFilesWithContent(filename):
 #     f = open(filepath, "r")
 #     print(f.read())  
 #     f.close()
-
-generateFilesWithContent(fileLocation)
