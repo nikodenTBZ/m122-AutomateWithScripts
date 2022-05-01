@@ -4,7 +4,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-def send_bill_txt_and_bill_xml_to_email(bill_txt, bill_xml, email_address):
+
+def send_bill_txt_and_bill_xml_to_email(email_address):
     """
     Sends bill_txt and bill_xml to email_address.
     """

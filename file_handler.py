@@ -1,9 +1,11 @@
-#Read the filecontent of the .data file split by ; into variables and print those variables into the console and save the different variables into a list
+# Read the filecontent of the .data file split by ; into variables and print those variables into the console and
+# save the different variables into a list
 fileLocation = "./files/raw/rechnung21003.data"
 
-def generateFilesWithContent(filename):
+
+def generate_files_with_content(filename):
     invoice_txt = ""
-    billFileRaw = open(filename, "r") #open file to read content
+    billFileRaw = open(filename, "r")  # open file to read content
     lines = billFileRaw.readlines()
     data = []
     for line in lines:
