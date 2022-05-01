@@ -59,7 +59,7 @@
           <NAME>
             <Line-35>Adam Adler</Line-35>
             <Line-35>Bahnhofstrasse 1</Line-35>
-            <Line-35>8000 Zürich</Line-35>
+            <Line-35>8000 Zï¿½rich</Line-35>
             <Line-35></Line-35>
             <Line-35></Line-35>
           </NAME>
@@ -113,10 +113,10 @@
       </VAT-AMOUNT>
       <DEPOSIT-AMOUNT>
         <Amount></Amount>
-          <REFERENCE-DATE>
-            <Reference-No></Reference-No>
-            <Date></Date>
-          </REFERENCE-DATE>
+        <REFERENCE-DATE>
+          <Reference-No></Reference-No>
+          <Date></Date>
+        </REFERENCE-DATE>
       </DEPOSIT-AMOUNT>
       <EXTENDED-AMOUNT Type="79">
         <Amount></Amount>
@@ -141,7 +141,7 @@
             <Payment-Period Type="M" On-Or-After="1" Reference-Day="31"></Payment-Period>
             <Date></Date>
           </TERMS>
-          <Back-Pack-Container Encode="Base64"> </Back-Pack-Container>
+          <Back-Pack-Container Encode="Base64"></Back-Pack-Container>
         </DISCOUNT>
       </PAYMENT-TERMS>
     </SUMMARY>

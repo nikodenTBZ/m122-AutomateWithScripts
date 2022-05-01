@@ -31,9 +31,10 @@ def generate_files_with_content():
             print(endcustomer)
             print(data) 
 
-        # for pos in data:
-        #     print(pos)
-        # print(data)
+        create_txt_file(overview, origin, endcustomer, data)
+        create_xml_file(overview, origin, endcustomer, data)
+        
+def create_txt_file(overview, origin, endcustomer, data):
 
         bill_name = overview[0]
         bill_number = bill_name.split("_")[1]
@@ -80,15 +81,13 @@ def generate_files_with_content():
             print("Customer name:\t" + customer_name)
             print("Customer address:\t" + customer_address)
             print("Customer postcode:\t" + customer_postcode)
-
+        
+        #Create txt file
         filePathTxtInvoice = "files/bill_txt/" + sender_number +"_"+ bill_number + "_invoice.txt"
-        filePathXmlInvoice = "files/bill_xml/" + sender_number +"_"+ bill_number + "_invoice.xml"
         if debug: print("filePathTxtInvoice", filePathTxtInvoice)
-        # if debug: print("filePathXmlInvoice", filePathXmlInvoice)
-        invoiceFileTxt = open(filePathTxtInvoice, "w")
-        invoiceFileXml = open(filePathXmlInvoice, "w")
-
-        ################################################ TXT ################################################
+        invoiceFileTxt = open(filePathTxtInvoice, "w")        
+        
+        #Write header
         invoiceFileTxt.write("\n\n\n\n\n")
         invoiceFileTxt.write("\n")
         invoiceFileTxt.write(origin_name + "\n")
@@ -103,13 +102,13 @@ def generate_files_with_content():
         invoiceFileTxt.write("\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + customer_postcode + "\n")
         invoiceFileTxt.write("\n")
 
+        #Write Details
         invoiceFileTxt.write("Kundennummer:\t\t" + sender_number + "\n")
         invoiceFileTxt.write("Auftragsnummer:\t\t" + order_number + "\n")
         invoiceFileTxt.write("\n")
         invoiceFileTxt.write("Rechnung Nr\t\t" + bill_number + "\n")
         invoiceFileTxt.write("-----------------------\n")
-        ################################################ TXT ################################################
-
+        
         full_amount = 0
         vat_amount = 0
 
@@ -131,26 +130,26 @@ def generate_files_with_content():
                 print("end_sum:\t", end_sum)
                 print("vat:\t\t", vat)
                 print("vat_num:\t\t", vat_num)
-        ################################################ TXT ################################################
+        #Generate Job Details
         invoiceFileTxt.write("  " + bill_pos + "\t\t" + topic + "\t\t\t" + order_amount + "\t\t" + price + "\t\t" + end_sum + "\t\t" + vat + "\n")
-        ################################################ TXT ################################################
+        
         if debug: print(full_amount)
         full_sum = full_amount + vat_amount
-        ################################################ TXT ################################################
+        
         invoiceFileTxt.write("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t----------\n")
         invoiceFileTxt.write("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tTotal CHF\t\t\t\t\t\t" + str(full_sum) + "\n")
         invoiceFileTxt.write("\n")
         invoiceFileTxt.write("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tMWST  CHF\t\t\t\t\t\t" + str(vat_amount) + "\n")
         invoiceFileTxt.write("\n\n\n\n\n\n\n\n\n\n\n\n\n")
-        ################################################ TXT ################################################
+        
         #add payment goal +30 days
         pay_goal = remove_str(pay_goal, "ZahlungszielInTagen_")
         d = get_payment_day(date, pay_goal)
-        ################################################ TXT ################################################
+        
         invoiceFileTxt.write("Zahlungsziel ohne Abzug " + pay_goal +" Tage (" + d +")\n\n")
-        ################################################ TXT ################################################
+        
         #Print Einzahlungsschein
-        ################################################ TXT ################################################
+        
         invoiceFileTxt.write("Einzahlungsschein")
         invoiceFileTxt.write("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")  
         invoiceFileTxt.write("\t\t" + str(full_sum) + "\t\t\t\t\t\t\t\t\t\t\t\t" + str(full_sum) + "\t\t\t\t" + customer_name + "\n")  
@@ -160,9 +159,181 @@ def generate_files_with_content():
         invoiceFileTxt.write(customer_name + "\n")
         invoiceFileTxt.write(customer_address + "\n")
         invoiceFileTxt.write(customer_postcode + "\n")
-        invoiceFileTxt.close()   
-        ################################################ TXT ################################################
+        invoiceFileTxt.close()
+        print("Invoice TXT created")
+
+def create_xml_file(overview, origin, endcustomer, data):
+    
+        bill_name = overview[0]
+        bill_number = bill_name.split("_")[1]
+        order_name = overview[1]
+        order_number = order_name.split("_")[1]
+        location = overview[2]
+        date = overview[3]
+        time = overview[4]
+        pay_goal = overview[5]
+
+        origin_number = origin[1]
+        sender_number = origin[2]
+        origin_name = origin[3]
+        origin_address = origin[4]
+        origin_postcode = origin[5]
+        origin_vat_number = origin[6]
+        origin_email = origin[7]
+
+        receiver_number = endcustomer[1]
+        customer_name = endcustomer[2]
+        customer_address = endcustomer[3]
+        customer_postcode = endcustomer[4]
+        if debug:
+            print("Bill Name:\t" + bill_name)
+            print("Bill Number:\t" + bill_number)
+            print("Order Name:\t" + order_name)
+            print("Order Number:\t" + order_number)
+            print("Location:\t" + location)
+            print("Date:\t" + date)
+            print("Time:\t" + time)
+            print("Pay goal:\t" + pay_goal)
+
+            print("Origin number:\t" + origin_number)
+            print("Sender number:\t" + sender_number)
+            print("Origin name:\t" + origin_name)
+            print("Origin address:\t" + origin_address)
+            print("Origin postcode:\t" + origin_postcode)
+            print("Origin vat number:\t" + origin_vat_number)
+            print("Origin vat number:\t" + origin_vat_number)
+            print("Origin vat number:\t" + origin_vat_number)
+            print("Origin email:\t" + origin_email)
+
+            print("Receiver number:\t" + receiver_number)
+            print("Customer name:\t" + customer_name)
+            print("Customer address:\t" + customer_address)
+            print("Customer postcode:\t" + customer_postcode)
+
+        filePathXmlInvoice = "files/bill_xml/" + sender_number +"_"+ bill_number + "_invoice.xml"
+        invoiceFileXml = open(filePathXmlInvoice, "w")
+        if debug: print("filePathXmlInvoice", filePathXmlInvoice)
+    
+
+        ################################################ XML ################################################
+        invoiceFileXml.write("<XML-FSCM-INVOICE-2003A>\n"+t(1)+"<INTERCHANGE>\n"+t(2)+"<IC-SENDER>\n")
+        invoiceFileXml.write(t(3)+"<Pid>41010000001234567</Pid>\n")#TODO
+        invoiceFileXml.write(t(2)+'</IC-SENDER>'+'\n'+ t(2)+'<IC-RECEIVER>\n')
+        invoiceFileXml.write(t(3)+"<Pid>41301000000012497</Pid>\n")#TODO
+        invoiceFileXml.write(t(2)+'</IC-RECEIVER>\n'+t(2)+'<IR-Ref />\n'+t(1)+'</INTERCHANGE>\n'+t(1)+'<INVOICE>\n'+t(2)+'<HEADER>\n'+t(3)+'<FUNCTION-FLAGS>\n'+t(4)+'<Confirmation-Flag />\n'+t(4)+'<Canellation-Flag />\n'+t(3)+'</FUNCTION-FLAGS>\n'+t(3)+'<MESSAGE-REFERENCE>\n'+t(4)+'<REFERENCE-DATE>\n')
+        invoiceFileXml.write(t(5)+'<Reference-No>202007164522001</Reference-No>\n')#TODO
+        invoiceFileXml.write(t(5)+'<Date>20200731</Date>\n')#TODO
+        invoiceFileXml.write(t(4)+'</REFERENCE-DATE>\n'+t(3)+'</MESSAGE-REFERENCE>\n'+t(3)+'<PRINT-DATE>\n')
+        invoiceFileXml.write(t(4)+'<Date>20200731</Date>\n')#TODO
+        invoiceFileXml.write(t(3)+'</PRINT-DATE>\n'+t(3)+'<REFERENCE>\n'+t(4)+'<INVOICE-REFERENCE>\n'+t(5)+'<REFERENCE-DATE>\n')
+        invoiceFileXml.write(t(6)+'<Reference-No>21003</Reference-No>\n'+ t(6)+'<Date>20200731</Date>\n')#TODO
+        invoiceFileXml.write(t(5)+'</REFERENCE-DATE>\n'+t(4)+'</INVOICE-REFERENCE>\n'+t(4)+'<ORDER>\n'+t(3)+'<REFERENCE-DATE>\n')
+        invoiceFileXml.write('<Reference-No>A003</Reference-No>\n')
+        invoiceFileXml.write('<Date>20200731</Date>\n')#TODO
+        invoiceFileXml.write('</REFERENCE-DATE>\n</ORDER>\n<REMINDER Which="MAH">\n<REFERENCE-DATE>\n<Reference-No>\n</Reference-No>\n<Date></Date>\n</REFERENCE-DATE>\n</REMINDER>\n<OTHER-REFERENCE Type="ADE">\n<REFERENCE-DATE>\n')
+        invoiceFileXml.write('<Reference-No>12345678</Reference-No>\n')#TODO
+        invoiceFileXml.write('<Date>20200731</Date>\n')#TODO
+        invoiceFileXml.write('</REFERENCE-DATE>\n</OTHER-REFERENCE>\n</REFERENCE>\n<BILLER>\n')
+        invoiceFileXml.write('<Tax-No>CHE-111.222.333 MWST</Tax-No>\n')#TODO
+        invoiceFileXml.write('<Doc-Reference Type="ESR-ALT "></Doc-Reference>\n<PARTY-ID>\n')
+        invoiceFileXml.write('<Pid>41010000001234567</Pid>\n')#TODO
         
+        invoiceFileXml.write('</PARTY-ID>\n<NAME-ADDRESS Format="COM">\n<NAME>\n')
+        invoiceFileXml.write('<Line-35>Adam Adler</Line-35>\n')#TODO
+        invoiceFileXml.write('<Line-35>Bahnhofstrasse 1</Line-35>\n')#TODO
+        invoiceFileXml.write('<Line-35>8000 Zuerich</Line-35>\n')#TODO
+        invoiceFileXml.write('<Line-35></Line-35>\n<Line-35></Line-35>\n')#TODO
+        
+        invoiceFileXml.write('</NAME>\n')
+        invoiceFileXml.write('<STREET>\n')
+        invoiceFileXml.write('<Line-35></Line-35>\n')
+        invoiceFileXml.write('<Line-35></Line-35>\n')
+        invoiceFileXml.write('<Line-35></Line-35>\n')
+        invoiceFileXml.write('</STREET>\n')
+        invoiceFileXml.write('<City></City>\n')
+        invoiceFileXml.write('<State></State>\n')
+        invoiceFileXml.write('<Zip></Zip>\n')
+        invoiceFileXml.write('<Country></Country>\n')
+        invoiceFileXml.write('</NAME-ADDRESS>\n')
+        invoiceFileXml.write('<BANK-INFO>\n')
+        invoiceFileXml.write('<Acct-No></Acct-No>\n')
+        invoiceFileXml.write('<Acct-Name></Acct-Name>\n')
+        invoiceFileXml.write('<BankId Type="BCNr-nat" Country="CH">001996</BankId>\n')
+        invoiceFileXml.write('</BANK-INFO>\n')
+        invoiceFileXml.write('</BILLER>\n')
+        
+        invoiceFileXml.write('<PAYER>\n')
+        invoiceFileXml.write('<PARTY-ID>\n')
+        invoiceFileXml.write('<Pid>41301000000012497</Pid>\n') #TODO
+        invoiceFileXml.write('</PARTY-ID>\n')
+        invoiceFileXml.write('<NAME-ADDRESS Format="COM">\n')
+        invoiceFileXml.write('<NAME>\n')
+        invoiceFileXml.write('<Line-35>Autoleasing AG</Line-35>\n')#TODO
+        invoiceFileXml.write('<Line-35>Gewerbestrasse 100</Line-35>\n')#TODO
+        invoiceFileXml.write('<Line-35>5000 Aarau</Line-35>\n')#TODO
+        invoiceFileXml.write('<Line-35></Line-35>\n')
+        invoiceFileXml.write('<Line-35></Line-35>\n')
+        invoiceFileXml.write('</NAME>\n')
+        invoiceFileXml.write('<STREET>\n')
+        invoiceFileXml.write('<Line-35></Line-35>\n')
+        invoiceFileXml.write('<Line-35></Line-35>\n')
+        invoiceFileXml.write('<Line-35></Line-35>\n')
+        invoiceFileXml.write('</STREET>\n')
+        invoiceFileXml.write('<City></City>\n')
+        invoiceFileXml.write('<State></State>\n')
+        invoiceFileXml.write('<Zip></Zip>\n')
+        invoiceFileXml.write('<Country></Country>\n')
+        invoiceFileXml.write('</NAME-ADDRESS>\n')
+        
+        invoiceFileXml.write('</PAYER>\n')
+        invoiceFileXml.write('</HEADER>\n')
+        invoiceFileXml.write('<LINE-ITEM />\n')
+        invoiceFileXml.write('<SUMMARY>\n')
+        invoiceFileXml.write('<INVOICE-AMOUNT>\n')
+        invoiceFileXml.write('<Amount>0000135000</Amount>\n')
+        invoiceFileXml.write('</INVOICE-AMOUNT>\n')
+        invoiceFileXml.write('<VAT-AMOUNT>\n')
+        invoiceFileXml.write('<Amount></Amount>\n') #VAT AMOUNT HERE#TODO
+        invoiceFileXml.write('</VAT-AMOUNT>\n')
+        invoiceFileXml.write('<DEPOSIT-AMOUNT>\n')
+        invoiceFileXml.write('<Amount></Amount>\n')
+        invoiceFileXml.write('<REFERENCE-DATE>\n')
+        invoiceFileXml.write('<Reference-No></Reference-No>\n')
+        invoiceFileXml.write('<Date></Date>\n')
+        invoiceFileXml.write('</REFERENCE-DATE>\n')
+        invoiceFileXml.write('</DEPOSIT-AMOUNT>\n')
+        invoiceFileXml.write('<EXTENDED-AMOUNT Type="79">\n')
+        invoiceFileXml.write('<Amount></Amount>\n')
+        invoiceFileXml.write('</EXTENDED-AMOUNT>\n')
+        invoiceFileXml.write('<TAX>\n')
+        invoiceFileXml.write('<TAX-BASIS>\n')
+        invoiceFileXml.write('<Amount></Amount>\n')
+        invoiceFileXml.write('</TAX-BASIS>\n')
+        invoiceFileXml.write('<Rate Categorie="S">0</Rate>\n')
+        invoiceFileXml.write('<Amount></Amount>\n')
+        invoiceFileXml.write('</TAX>\n')
+        invoiceFileXml.write('<PAYMENT-TERMS>\n')
+        invoiceFileXml.write('<BASIC Payment-Type="ESR" Terms-Type="1">\n')
+        invoiceFileXml.write('<TERMS>\n')
+        invoiceFileXml.write('<Payment-Period Type="M" On-Or-After="1" Reference-Day="31">30</Payment-Period>\n') #PAYMENT DAY#TODO
+        invoiceFileXml.write('<Date>20200831</Date>\n')#PAYMENT DAY#TODO
+        invoiceFileXml.write('</TERMS>\n')
+        invoiceFileXml.write('</BASIC>\n')
+        invoiceFileXml.write('<DISCOUNT Terms-Type="22">\n')
+        invoiceFileXml.write('<Discount-Percentage>0.0</Discount-Percentage>\n')
+        invoiceFileXml.write('<TERMS>\n')
+        invoiceFileXml.write('<Payment-Period Type="M" On-Or-After="1" Reference-Day="31"></Payment-Period>\n')#TODO
+        invoiceFileXml.write('<Date></Date>\n')
+        invoiceFileXml.write('</TERMS>\n')
+        invoiceFileXml.write('<Back-Pack-Container Encode="Base64"> </Back-Pack-Container>\n')
+        invoiceFileXml.write('</DISCOUNT>\n')
+        invoiceFileXml.write('</PAYMENT-TERMS>\n')
+        invoiceFileXml.write('</SUMMARY>\n')
+        invoiceFileXml.write('</INVOICE>\n')
+        invoiceFileXml.write('</XML-FSCM-INVOICE-2003A>')
+        
+        invoiceFileXml.close()
+        print("Invoice XML created")
         
 #Remove a specific string from a string
 def remove_str(original, strToBeRemoved):
@@ -176,3 +347,12 @@ def get_payment_day(date, offset):
     d = d + timedelta(days=int(offset))
     d = d.strftime('%d.%m.%Y')
     return d
+
+#Generate Tabs from amount
+def t(amount):
+    str = ""
+    i = 0
+    while(i < amount):
+        i = i + 1
+        str += "\t"
+    return str
