@@ -1,6 +1,7 @@
 # Read the filecontent of the .data file split by ; into variables and print those variables into the console and
 # save the different variables into a list
 import os
+from datetime import datetime, timedelta
 
 # debug = True
 debug = False
@@ -83,12 +84,11 @@ def generate_files_with_content():
         filePathTxtInvoice = "files/bill_txt/" + sender_number +"_"+ bill_number + "_invoice.txt"
         filePathXmlInvoice = "files/bill_xml/" + sender_number +"_"+ bill_number + "_invoice.xml"
         if debug: print("filePathTxtInvoice", filePathTxtInvoice)
-        # print("filePathXmlInvoice", filePathXmlInvoice)
+        # if debug: print("filePathXmlInvoice", filePathXmlInvoice)
         invoiceFileTxt = open(filePathTxtInvoice, "w")
         invoiceFileXml = open(filePathXmlInvoice, "w")
-        # invoiceFileTxt = open(filePathTxtInvoice, "a", encoding='utf-8')
-        # invoiceFileTxt = open(filePathXmlInvoice, "a", encoding='utf-8')
 
+        ################################################ TXT ################################################
         invoiceFileTxt.write("\n\n\n\n\n")
         invoiceFileTxt.write("\n")
         invoiceFileTxt.write(origin_name + "\n")
@@ -108,6 +108,7 @@ def generate_files_with_content():
         invoiceFileTxt.write("\n")
         invoiceFileTxt.write("Rechnung Nr\t\t" + bill_number + "\n")
         invoiceFileTxt.write("-----------------------\n")
+        ################################################ TXT ################################################
 
         full_amount = 0
         vat_amount = 0
@@ -130,17 +131,26 @@ def generate_files_with_content():
                 print("end_sum:\t", end_sum)
                 print("vat:\t\t", vat)
                 print("vat_num:\t\t", vat_num)
-            invoiceFileTxt.write("  " + bill_pos + "\t\t" + topic + "\t\t\t" + order_amount + "\t\t" + price + "\t\t" + end_sum + "\t\t" + vat + "\n")
+        ################################################ TXT ################################################
+        invoiceFileTxt.write("  " + bill_pos + "\t\t" + topic + "\t\t\t" + order_amount + "\t\t" + price + "\t\t" + end_sum + "\t\t" + vat + "\n")
+        ################################################ TXT ################################################
         if debug: print(full_amount)
         full_sum = full_amount + vat_amount
+        ################################################ TXT ################################################
         invoiceFileTxt.write("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t----------\n")
         invoiceFileTxt.write("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tTotal CHF\t\t\t\t\t\t" + str(full_sum) + "\n")
         invoiceFileTxt.write("\n")
         invoiceFileTxt.write("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tMWST  CHF\t\t\t\t\t\t" + str(vat_amount) + "\n")
         invoiceFileTxt.write("\n\n\n\n\n\n\n\n\n\n\n\n\n")
-        #TODO: add payment goal +30 days
-        invoiceFileTxt.write("Zahlungsziel ohne Abzug " + remove_str(pay_goal, "ZahlungszielInTagen_") +" Tage ()\n\n")
+        ################################################ TXT ################################################
+        #add payment goal +30 days
+        pay_goal = remove_str(pay_goal, "ZahlungszielInTagen_")
+        d = get_payment_day(date, pay_goal)
+        ################################################ TXT ################################################
+        invoiceFileTxt.write("Zahlungsziel ohne Abzug " + pay_goal +" Tage (" + d +")\n\n")
+        ################################################ TXT ################################################
         #Print Einzahlungsschein
+        ################################################ TXT ################################################
         invoiceFileTxt.write("Einzahlungsschein")
         invoiceFileTxt.write("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")  
         invoiceFileTxt.write("\t\t" + str(full_sum) + "\t\t\t\t\t\t\t\t\t\t\t\t" + str(full_sum) + "\t\t\t\t" + customer_name + "\n")  
@@ -150,12 +160,19 @@ def generate_files_with_content():
         invoiceFileTxt.write(customer_name + "\n")
         invoiceFileTxt.write(customer_address + "\n")
         invoiceFileTxt.write(customer_postcode + "\n")
-            
-            
         invoiceFileTxt.close()   
-
-
+        ################################################ TXT ################################################
+        
+        
+#Remove a specific string from a string
 def remove_str(original, strToBeRemoved):
     str = original.replace(strToBeRemoved, "")
     if debug: print("NEW STRING", str)
     return str
+
+#Calculate the new date from a specific date plus offset
+def get_payment_day(date, offset):
+    d = datetime.strptime(date, '%d.%m.%Y')
+    d = d + timedelta(days=int(offset))
+    d = d.strftime('%d.%m.%Y')
+    return d
