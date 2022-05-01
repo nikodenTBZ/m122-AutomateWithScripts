@@ -1,9 +1,9 @@
-
-
 # Read the filecontent of the .data file split by ; into variables and print those variables into the console and
 # save the different variables into a list
 import os
 
+# debug = True
+debug = False
 
 def generate_files_with_content():
     # loop through files/raw data
@@ -24,11 +24,11 @@ def generate_files_with_content():
         data.pop(0)
         endcustomer = data[0]
         data.pop(0)
-
-        print(overview)
-        print(origin)
-        print(endcustomer)
-        print(data)
+        if debug:
+            print(overview)
+            print(origin)
+            print(endcustomer)
+            print(data) 
 
         # for pos in data:
         #     print(pos)
@@ -55,32 +55,34 @@ def generate_files_with_content():
         customer_name = endcustomer[2]
         customer_address = endcustomer[3]
         customer_postcode = endcustomer[4]
+        if debug:
+            print("Bill Name:\t" + bill_name)
+            print("Bill Number:\t" + bill_number)
+            print("Order Name:\t" + order_name)
+            print("Order Number:\t" + order_number)
+            print("Location:\t" + location)
+            print("Date:\t" + date)
+            print("Time:\t" + time)
+            print("Pay goal:\t" + pay_goal)
 
-        print("Bill Name:\t" + bill_name)
-        print("Bill Number:\t" + bill_number)
-        print("Order Name:\t" + order_name)
-        print("Order Number:\t" + order_number)
-        print("Location:\t" + location)
-        print("Date:\t" + date)
-        print("Time:\t" + time)
-        print("Pay goal:\t" + pay_goal)
+            print("Origin number:\t" + origin_number)
+            print("Sender number:\t" + sender_number)
+            print("Origin name:\t" + origin_name)
+            print("Origin address:\t" + origin_address)
+            print("Origin postcode:\t" + origin_postcode)
+            print("Origin vat number:\t" + origin_vat_number)
+            print("Origin vat number:\t" + origin_vat_number)
+            print("Origin vat number:\t" + origin_vat_number)
+            print("Origin email:\t" + origin_email)
 
-        print("Origin number:\t" + origin_number)
-        print("Sender number:\t" + sender_number)
-        print("Origin name:\t" + origin_name)
-        print("Origin address:\t" + origin_address)
-        print("Origin postcode:\t" + origin_postcode)
-        print("Origin vat number:\t" + origin_vat_number)
-        print("Origin email:\t" + origin_email)
-
-        print("Receiver number:\t" + receiver_number)
-        print("Customer name:\t" + customer_name)
-        print("Customer address:\t" + customer_address)
-        print("Customer postcode:\t" + customer_postcode)
+            print("Receiver number:\t" + receiver_number)
+            print("Customer name:\t" + customer_name)
+            print("Customer address:\t" + customer_address)
+            print("Customer postcode:\t" + customer_postcode)
 
         filePathTxtInvoice = "files/bill_txt/" + sender_number +"_"+ bill_number + "_invoice.txt"
         filePathXmlInvoice = "files/bill_xml/" + sender_number +"_"+ bill_number + "_invoice.xml"
-        print("filePathTxtInvoice", filePathTxtInvoice)
+        if debug: print("filePathTxtInvoice", filePathTxtInvoice)
         # print("filePathXmlInvoice", filePathXmlInvoice)
         invoiceFileTxt = open(filePathTxtInvoice, "w")
         invoiceFileXml = open(filePathXmlInvoice, "w")
@@ -97,15 +99,18 @@ def generate_files_with_content():
         invoiceFileTxt.write("\n\n\n\n\n")
 
         invoiceFileTxt.write(location + ", den " + date + "\t\t\t"+ customer_name +"\n")
-        invoiceFileTxt.write("\t\t\t\t\t\t\t\t" + customer_address + "\n")
-        invoiceFileTxt.write("\t\t\t\t\t\t\t\t" + customer_postcode + "\n")
+        invoiceFileTxt.write("\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + customer_address + "\n")
+        invoiceFileTxt.write("\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + customer_postcode + "\n")
         invoiceFileTxt.write("\n")
 
-        invoiceFileTxt.write("Kundennummer:\t" + sender_number + "\n")
-        invoiceFileTxt.write("Auftragsnummer:\t" + order_number + "\n")
+        invoiceFileTxt.write("Kundennummer:\t\t" + sender_number + "\n")
+        invoiceFileTxt.write("Auftragsnummer:\t\t" + order_number + "\n")
         invoiceFileTxt.write("\n")
-        invoiceFileTxt.write("Rechnung Nr\t" + bill_number + "\n")
+        invoiceFileTxt.write("Rechnung Nr\t\t" + bill_number + "\n")
         invoiceFileTxt.write("-----------------------\n")
+
+        full_amount = 0
+        vat_amount = 0
 
         for d in data:
             bill_pos = d[1]
@@ -113,16 +118,44 @@ def generate_files_with_content():
             order_amount = d[3]
             price = d[4]
             end_sum = d[5]
-            vat = d[6]
+            vat = remove_str(d[6], "MWST_")
+            full_amount = full_amount + float(end_sum)
+            vat_num = float(remove_str(vat, "%"))
+            vat_amount = vat_amount + vat_num * float(end_sum) / 100
+            if debug:
+                print("bill_pos:\t", bill_pos)
+                print("topic:\t\t", topic)
+                print("order_amount:\t", order_amount)
+                print("price:\t\t", price)
+                print("end_sum:\t", end_sum)
+                print("vat:\t\t", vat)
+                print("vat_num:\t\t", vat_num)
+            invoiceFileTxt.write("  " + bill_pos + "\t\t" + topic + "\t\t\t" + order_amount + "\t\t" + price + "\t\t" + end_sum + "\t\t" + vat + "\n")
+        if debug: print(full_amount)
+        full_sum = full_amount + vat_amount
+        invoiceFileTxt.write("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t----------\n")
+        invoiceFileTxt.write("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tTotal CHF\t\t\t\t\t\t" + str(full_sum) + "\n")
+        invoiceFileTxt.write("\n")
+        invoiceFileTxt.write("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tMWST  CHF\t\t\t\t\t\t" + str(vat_amount) + "\n")
+        invoiceFileTxt.write("\n\n\n\n\n\n\n\n\n\n\n\n\n")
+        #TODO: add payment goal +30 days
+        invoiceFileTxt.write("Zahlungsziel ohne Abzug " + remove_str(pay_goal, "ZahlungszielInTagen_") +" Tage ()\n\n")
+        #Print Einzahlungsschein
+        invoiceFileTxt.write("Einzahlungsschein")
+        invoiceFileTxt.write("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")  
+        invoiceFileTxt.write("\t\t" + str(full_sum) + "\t\t\t\t\t\t\t\t\t\t\t\t" + str(full_sum) + "\t\t\t\t" + customer_name + "\n")  
+        invoiceFileTxt.write("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + customer_address + "\n")
+        invoiceFileTxt.write("0 00000 00000 00000\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + customer_postcode + "\n")
+        invoiceFileTxt.write("\n")
+        invoiceFileTxt.write(customer_name + "\n")
+        invoiceFileTxt.write(customer_address + "\n")
+        invoiceFileTxt.write(customer_postcode + "\n")
+            
+            
+        invoiceFileTxt.close()   
 
-            print("bill_pos:\t", bill_pos)
-            print("topic:\t\t", topic)
-            print("order_amount:\t", order_amount)
-            print("price:\t\t", price)
-            print("end_sum:\t", end_sum)
-            print("vat:\t\t", vat)
 
-            invoiceFileTxt.write("  " + bill_pos + "\t" + topic + "\t\t" + order_amount + "\t\t" + price + "\t\t" + end_sum + "\t\t" + vat + "\n")
-
-        invoiceFileTxt.write("\n\n\n\n\n\n\n\n\n\n-----------")
-        invoiceFileTxt.close()
+def remove_str(original, strToBeRemoved):
+    str = original.replace(strToBeRemoved, "")
+    if debug: print("NEW STRING", str)
+    return str
