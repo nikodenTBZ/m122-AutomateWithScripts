@@ -3,8 +3,8 @@
 import os
 from datetime import datetime, timedelta
 
-# debug = True
-debug = False
+debug = True
+# debug = False
 
 def generate_files_with_content():
     # loop through files/raw data
@@ -214,35 +214,41 @@ def create_xml_file(overview, origin, endcustomer, data):
         invoiceFileXml = open(filePathXmlInvoice, "w")
         if debug: print("filePathXmlInvoice", filePathXmlInvoice)
     
-
+        pay_goal = remove_str(pay_goal, "ZahlungszielInTagen_")
+        d = get_payment_day(date, pay_goal)
+        clean_date = get_clean_date(date)
+        clean_payment_date = get_clean_date(d)
+        date_tag = generate_xml_tag("date", clean_date)
+        payment_date_tag = generate_xml_tag("date", clean_payment_date)
         ################################################ XML ################################################
         invoiceFileXml.write("<XML-FSCM-INVOICE-2003A>\n"+t(1)+"<INTERCHANGE>\n"+t(2)+"<IC-SENDER>\n")
-        invoiceFileXml.write(t(3)+"<Pid>41010000001234567</Pid>\n")#TODO
+        invoiceFileXml.write(t(3)+"<Pid>"+origin_number+"</Pid>\n")
         invoiceFileXml.write(t(2)+'</IC-SENDER>'+'\n'+ t(2)+'<IC-RECEIVER>\n')
-        invoiceFileXml.write(t(3)+"<Pid>41301000000012497</Pid>\n")#TODO
+        invoiceFileXml.write(t(3)+"<Pid>"+receiver_number+"</Pid>\n")
         invoiceFileXml.write(t(2)+'</IC-RECEIVER>\n'+t(2)+'<IR-Ref />\n'+t(1)+'</INTERCHANGE>\n'+t(1)+'<INVOICE>\n'+t(2)+'<HEADER>\n'+t(3)+'<FUNCTION-FLAGS>\n'+t(4)+'<Confirmation-Flag />\n'+t(4)+'<Canellation-Flag />\n'+t(3)+'</FUNCTION-FLAGS>\n'+t(3)+'<MESSAGE-REFERENCE>\n'+t(4)+'<REFERENCE-DATE>\n')
-        invoiceFileXml.write(t(5)+'<Reference-No>202007164522001</Reference-No>\n')#TODO
-        invoiceFileXml.write(t(5)+'<Date>20200731</Date>\n')#TODO
+        invoiceFileXml.write(t(5)+'<Reference-No>202007164522001</Reference-No>\n')#TODO NOT LISTED
+        invoiceFileXml.write(date_tag+'\n')
         invoiceFileXml.write(t(4)+'</REFERENCE-DATE>\n'+t(3)+'</MESSAGE-REFERENCE>\n'+t(3)+'<PRINT-DATE>\n')
-        invoiceFileXml.write(t(4)+'<Date>20200731</Date>\n')#TODO
+        invoiceFileXml.write(date_tag+'\n')
         invoiceFileXml.write(t(3)+'</PRINT-DATE>\n'+t(3)+'<REFERENCE>\n'+t(4)+'<INVOICE-REFERENCE>\n'+t(5)+'<REFERENCE-DATE>\n')
-        invoiceFileXml.write(t(6)+'<Reference-No>21003</Reference-No>\n'+ t(6)+'<Date>20200731</Date>\n')#TODO
+        invoiceFileXml.write(t(6)+'<Reference-No>'+bill_number+'</Reference-No>\n')
+        invoiceFileXml.write(date_tag+'\n')
         invoiceFileXml.write(t(5)+'</REFERENCE-DATE>\n'+t(4)+'</INVOICE-REFERENCE>\n'+t(4)+'<ORDER>\n'+t(3)+'<REFERENCE-DATE>\n')
-        invoiceFileXml.write('<Reference-No>A003</Reference-No>\n')
-        invoiceFileXml.write('<Date>20200731</Date>\n')#TODO
+        invoiceFileXml.write('<Reference-No>'+order_number+'</Reference-No>\n')
+        invoiceFileXml.write(date_tag+'\n')
         invoiceFileXml.write('</REFERENCE-DATE>\n</ORDER>\n<REMINDER Which="MAH">\n<REFERENCE-DATE>\n<Reference-No>\n</Reference-No>\n<Date></Date>\n</REFERENCE-DATE>\n</REMINDER>\n<OTHER-REFERENCE Type="ADE">\n<REFERENCE-DATE>\n')
-        invoiceFileXml.write('<Reference-No>12345678</Reference-No>\n')#TODO
-        invoiceFileXml.write('<Date>20200731</Date>\n')#TODO
+        invoiceFileXml.write('<Reference-No>12345678</Reference-No>\n')#TODO NOT LISTED
+        invoiceFileXml.write(date_tag+'\n')
         invoiceFileXml.write('</REFERENCE-DATE>\n</OTHER-REFERENCE>\n</REFERENCE>\n<BILLER>\n')
-        invoiceFileXml.write('<Tax-No>CHE-111.222.333 MWST</Tax-No>\n')#TODO
+        invoiceFileXml.write('<Tax-No>'+origin_vat_number+'</Tax-No>\n')
         invoiceFileXml.write('<Doc-Reference Type="ESR-ALT "></Doc-Reference>\n<PARTY-ID>\n')
-        invoiceFileXml.write('<Pid>41010000001234567</Pid>\n')#TODO
+        invoiceFileXml.write('<Pid>'+origin_number+'</Pid>\n')
         
         invoiceFileXml.write('</PARTY-ID>\n<NAME-ADDRESS Format="COM">\n<NAME>\n')
-        invoiceFileXml.write('<Line-35>Adam Adler</Line-35>\n')#TODO
-        invoiceFileXml.write('<Line-35>Bahnhofstrasse 1</Line-35>\n')#TODO
-        invoiceFileXml.write('<Line-35>8000 Zuerich</Line-35>\n')#TODO
-        invoiceFileXml.write('<Line-35></Line-35>\n<Line-35></Line-35>\n')#TODO
+        invoiceFileXml.write('<Line-35>'+customer_name+'</Line-35>\n')
+        invoiceFileXml.write('<Line-35>'+customer_address+'</Line-35>\n')
+        invoiceFileXml.write('<Line-35>'+customer_postcode+'</Line-35>\n')
+        invoiceFileXml.write('<Line-35></Line-35>\n<Line-35></Line-35>\n')
         
         invoiceFileXml.write('</NAME>\n')
         invoiceFileXml.write('<STREET>\n')
@@ -264,13 +270,13 @@ def create_xml_file(overview, origin, endcustomer, data):
         
         invoiceFileXml.write('<PAYER>\n')
         invoiceFileXml.write('<PARTY-ID>\n')
-        invoiceFileXml.write('<Pid>41301000000012497</Pid>\n') #TODO
+        invoiceFileXml.write('<Pid>'+receiver_number+'</Pid>\n') 
         invoiceFileXml.write('</PARTY-ID>\n')
         invoiceFileXml.write('<NAME-ADDRESS Format="COM">\n')
         invoiceFileXml.write('<NAME>\n')
-        invoiceFileXml.write('<Line-35>Autoleasing AG</Line-35>\n')#TODO
-        invoiceFileXml.write('<Line-35>Gewerbestrasse 100</Line-35>\n')#TODO
-        invoiceFileXml.write('<Line-35>5000 Aarau</Line-35>\n')#TODO
+        invoiceFileXml.write('<Line-35>'+customer_name+'</Line-35>\n')
+        invoiceFileXml.write('<Line-35>'+customer_address+'</Line-35>\n')
+        invoiceFileXml.write('<Line-35>'+customer_postcode+'</Line-35>\n')
         invoiceFileXml.write('<Line-35></Line-35>\n')
         invoiceFileXml.write('<Line-35></Line-35>\n')
         invoiceFileXml.write('</NAME>\n')
@@ -290,7 +296,7 @@ def create_xml_file(overview, origin, endcustomer, data):
         invoiceFileXml.write('<LINE-ITEM />\n')
         invoiceFileXml.write('<SUMMARY>\n')
         invoiceFileXml.write('<INVOICE-AMOUNT>\n')
-        invoiceFileXml.write('<Amount>0000135000</Amount>\n')
+        invoiceFileXml.write('<Amount>0000135000</Amount>\n')#FullAmount
         invoiceFileXml.write('</INVOICE-AMOUNT>\n')
         invoiceFileXml.write('<VAT-AMOUNT>\n')
         invoiceFileXml.write('<Amount></Amount>\n') #VAT AMOUNT HERE#TODO
@@ -315,14 +321,14 @@ def create_xml_file(overview, origin, endcustomer, data):
         invoiceFileXml.write('<PAYMENT-TERMS>\n')
         invoiceFileXml.write('<BASIC Payment-Type="ESR" Terms-Type="1">\n')
         invoiceFileXml.write('<TERMS>\n')
-        invoiceFileXml.write('<Payment-Period Type="M" On-Or-After="1" Reference-Day="31">30</Payment-Period>\n') #PAYMENT DAY#TODO
-        invoiceFileXml.write('<Date>20200831</Date>\n')#PAYMENT DAY#TODO
+        invoiceFileXml.write('<Payment-Period Type="M" On-Or-After="1" Reference-Day="31">'+pay_goal+'</Payment-Period>\n') #PAYMENT DAY#TODO
+        invoiceFileXml.write(payment_date_tag+'\n')
         invoiceFileXml.write('</TERMS>\n')
         invoiceFileXml.write('</BASIC>\n')
         invoiceFileXml.write('<DISCOUNT Terms-Type="22">\n')
         invoiceFileXml.write('<Discount-Percentage>0.0</Discount-Percentage>\n')
         invoiceFileXml.write('<TERMS>\n')
-        invoiceFileXml.write('<Payment-Period Type="M" On-Or-After="1" Reference-Day="31"></Payment-Period>\n')#TODO
+        invoiceFileXml.write('<Payment-Period Type="M" On-Or-After="1" Reference-Day="31"></Payment-Period>\n')
         invoiceFileXml.write('<Date></Date>\n')
         invoiceFileXml.write('</TERMS>\n')
         invoiceFileXml.write('<Back-Pack-Container Encode="Base64"> </Back-Pack-Container>\n')
@@ -331,7 +337,6 @@ def create_xml_file(overview, origin, endcustomer, data):
         invoiceFileXml.write('</SUMMARY>\n')
         invoiceFileXml.write('</INVOICE>\n')
         invoiceFileXml.write('</XML-FSCM-INVOICE-2003A>')
-        
         invoiceFileXml.close()
         print("Invoice XML created")
         
@@ -356,3 +361,16 @@ def t(amount):
         i = i + 1
         str += "\t"
     return str
+
+def generate_xml_tag(tag, value):
+    #switch tag return tag
+    
+    if tag == "date": return "<Date>"+str(value)+"</Date>"
+    if tag == "payment-day": return "<Payment-Day>"+str(value)+"</Payment-Day>"
+
+def get_clean_date(date):
+    d = datetime.strptime(date, '%d.%m.%Y')
+    d = d.strftime('%Y%m%d')
+    if debug: print("CLEAN DATE", d)
+    return d
+    
