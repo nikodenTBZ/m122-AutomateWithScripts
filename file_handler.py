@@ -1,12 +1,14 @@
 # Read the filecontent of the .data file split by ; into variables and print those variables into the console and
 # save the different variables into a list
 import os
+import log_handler
 from datetime import datetime, timedelta
 
 # debug = True
 debug = False
 
 def generate_files_with_content():
+    
     # loop through files/raw data
     for file in os.listdir("files/raw"):
 
@@ -31,10 +33,21 @@ def generate_files_with_content():
             print(endcustomer)
             print(data) 
 
+        bill_name = overview[0]
+        bill_number = bill_name.split("_")[1]
+
+        #create log file
+        log_handler.create_log_file(bill_number)
+        log = log_handler.open_log_file
+        log_handler.write(log, "Started generating txt bill for bill number: " + bill_number)
         create_txt_file(overview, origin, endcustomer, data)
-        create_xml_file(overview, origin, endcustomer, data)
+        log_handler.write(log, "Generated txt bill for bill number: " + bill_number)
         
-def create_txt_file(overview, origin, endcustomer, data):
+        log_handler.write(log, "Started generating xml bill for bill number: " + bill_number)
+        create_xml_file(overview, origin, endcustomer, data)
+        log_handler.write(log, "Generated xml bill for bill number: " + bill_number)
+        
+def create_txt_file(overview, origin, endcustomer, data, log_file):
 
         bill_name = overview[0]
         bill_number = bill_name.split("_")[1]
@@ -162,7 +175,7 @@ def create_txt_file(overview, origin, endcustomer, data):
         invoiceFileTxt.close()
         print("Invoice TXT created")
 
-def create_xml_file(overview, origin, endcustomer, data):
+def create_xml_file(overview, origin, endcustomer, data, log_file):
     
         bill_name = overview[0]
         bill_number = bill_name.split("_")[1]
