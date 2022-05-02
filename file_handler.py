@@ -220,6 +220,26 @@ def create_xml_file(overview, origin, endcustomer, data):
         clean_payment_date = get_clean_date(d)
         date_tag = generate_xml_tag("date", clean_date)
         payment_date_tag = generate_xml_tag("date", clean_payment_date)
+        
+        full_amount = 0
+        vat_amount = 0
+
+        for d in data:
+            order_amount = d[3]
+            price = d[4]
+            end_sum = d[5]
+            vat = remove_str(d[6], "MWST_")
+            full_amount = full_amount + float(end_sum)
+            vat_num = float(remove_str(vat, "%"))
+            vat_amount = vat_amount + vat_num * float(end_sum) / 100
+            if debug:
+                print("end_sum:\t", end_sum)
+                print("vat:\t\t", vat)
+                print("vat_num:\t\t", vat_num)
+
+        if debug: print(full_amount)
+        full_sum = full_amount + vat_amount
+        
         ################################################ XML ################################################
         invoiceFileXml.write("<XML-FSCM-INVOICE-2003A>\n"+t(1)+"<INTERCHANGE>\n"+t(2)+"<IC-SENDER>\n")
         invoiceFileXml.write(t(3)+"<Pid>"+origin_number+"</Pid>\n")
@@ -296,7 +316,8 @@ def create_xml_file(overview, origin, endcustomer, data):
         invoiceFileXml.write('<LINE-ITEM />\n')
         invoiceFileXml.write('<SUMMARY>\n')
         invoiceFileXml.write('<INVOICE-AMOUNT>\n')
-        invoiceFileXml.write('<Amount>0000135000</Amount>\n')#FullAmount
+        invoiceFileXml.write('<Amount>0000135000</Amount>\n')#TODO:Missing logic to round for rappen and add zeros.
+        # invoiceFileXml.write('<Amount>'+full_sum+'</Amount>\n')#FullAmount 
         invoiceFileXml.write('</INVOICE-AMOUNT>\n')
         invoiceFileXml.write('<VAT-AMOUNT>\n')
         invoiceFileXml.write('<Amount></Amount>\n') #VAT AMOUNT HERE#TODO
