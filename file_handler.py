@@ -3,8 +3,8 @@
 import os
 from datetime import datetime, timedelta
 
-debug = True
-# debug = False
+# debug = True
+debug = False
 
 def generate_files_with_content():
     # loop through files/raw data
@@ -131,7 +131,7 @@ def create_txt_file(overview, origin, endcustomer, data):
                 print("vat:\t\t", vat)
                 print("vat_num:\t\t", vat_num)
         #Generate Job Details
-        invoiceFileTxt.write("  " + bill_pos + "\t\t" + topic + "\t\t\t" + order_amount + "\t\t" + price + "\t\t" + end_sum + "\t\t" + vat + "\n")
+            invoiceFileTxt.write("  " + bill_pos + "\t\t" + topic + "\t\t\t" + order_amount + "\t\t" + price + "\t\t" + end_sum + "\t\t" + vat + "\n")
         
         if debug: print(full_amount)
         full_sum = full_amount + vat_amount
@@ -153,8 +153,8 @@ def create_txt_file(overview, origin, endcustomer, data):
         invoiceFileTxt.write("Einzahlungsschein")
         invoiceFileTxt.write("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")  
         invoiceFileTxt.write("\t\t" + str(full_sum) + "\t\t\t\t\t\t\t\t\t\t\t\t" + str(full_sum) + "\t\t\t\t" + customer_name + "\n")  
-        invoiceFileTxt.write("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + customer_address + "\n")
-        invoiceFileTxt.write("0 00000 00000 00000\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + customer_postcode + "\n")
+        invoiceFileTxt.write("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + customer_address + "\n")
+        invoiceFileTxt.write("0 00000 00000 00000\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + customer_postcode + "\n")
         invoiceFileTxt.write("\n")
         invoiceFileTxt.write(customer_name + "\n")
         invoiceFileTxt.write(customer_address + "\n")
@@ -265,9 +265,9 @@ def create_xml_file(overview, origin, endcustomer, data):
         invoiceFileXml.write('<Pid>'+origin_number+'</Pid>\n')
         
         invoiceFileXml.write('</PARTY-ID>\n<NAME-ADDRESS Format="COM">\n<NAME>\n')
-        invoiceFileXml.write('<Line-35>'+customer_name+'</Line-35>\n')
-        invoiceFileXml.write('<Line-35>'+customer_address+'</Line-35>\n')
-        invoiceFileXml.write('<Line-35>'+customer_postcode+'</Line-35>\n')
+        invoiceFileXml.write('<Line-35>'+origin_name+'</Line-35>\n')
+        invoiceFileXml.write('<Line-35>'+origin_address+'</Line-35>\n')
+        invoiceFileXml.write('<Line-35>'+origin_postcode+'</Line-35>\n')
         invoiceFileXml.write('<Line-35></Line-35>\n<Line-35></Line-35>\n')
         
         invoiceFileXml.write('</NAME>\n')
@@ -316,11 +316,11 @@ def create_xml_file(overview, origin, endcustomer, data):
         invoiceFileXml.write('<LINE-ITEM />\n')
         invoiceFileXml.write('<SUMMARY>\n')
         invoiceFileXml.write('<INVOICE-AMOUNT>\n')
-        invoiceFileXml.write('<Amount>0000135000</Amount>\n')#TODO:Missing logic to round for rappen and add zeros.
-        # invoiceFileXml.write('<Amount>'+full_sum+'</Amount>\n')#FullAmount 
+        long_amount = get_long_amount(full_sum)
+        invoiceFileXml.write('<Amount>'+long_amount+'</Amount>\n')#FullAmount 
         invoiceFileXml.write('</INVOICE-AMOUNT>\n')
         invoiceFileXml.write('<VAT-AMOUNT>\n')
-        invoiceFileXml.write('<Amount></Amount>\n') #VAT AMOUNT HERE#TODO
+        invoiceFileXml.write('<Amount>' + str(vat_amount) + '</Amount>\n') #VAT AMOUNT HERE#TODO
         invoiceFileXml.write('</VAT-AMOUNT>\n')
         invoiceFileXml.write('<DEPOSIT-AMOUNT>\n')
         invoiceFileXml.write('<Amount></Amount>\n')
@@ -395,3 +395,21 @@ def get_clean_date(date):
     if debug: print("CLEAN DATE", d)
     return d
     
+def get_long_amount(chf):
+    chf = str(chf)
+    x = chf.split(".")
+    #check ig decimal [1] is 2 digits long if not make it 2 digits long
+    if len(x[1]) == 1:
+        x[1] = str(x[1])+"0"
+    if debug: print("LONG AMOUNT", x[0]+x[1])
+    chf = x[0]+x[1]
+    
+    length = len(chf)
+    zeros_to_be_added = 10 - length
+    correct_amount = ""
+    i = 0
+    while(i < zeros_to_be_added):
+        i = i + 1
+        correct_amount += "0"
+        r = correct_amount+chf
+    return r
