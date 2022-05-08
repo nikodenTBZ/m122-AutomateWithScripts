@@ -1,23 +1,25 @@
 import log_handler
 #Create log file in files/logs/
-def create_new_log_file(filename):
+def create_log_file(file_name):
         #Create txt file
-        filePathLogFile = "files/logs/" + filename +"_log.txt"
+        filePathLogFile = "files/logs/" + str(file_name) +"_log.txt"
         print("filePathTxtInvoice", filePathLogFile)
         logFile = open(filePathLogFile, "w")
+        close_log_file(logFile)
         logFile.close()
         
 def open_log_file(filename):
         #Open txt file
-        filePathLogFile = "files/logs/" + filename +"_log.txt"
+        filePathLogFile = "files/logs/" + str(filename) +"_log.txt"
         print("filePathTxtInvoice", filePathLogFile)
         logFile = open(filePathLogFile, "a")
         return logFile
 
-def write_log(filename, content):
+def log(filename, content):
         logFile = open_log_file(filename)
         logFile.write(content + "\n")
+        close_log_file(logFile)
         return logFile
-    
+
 def close_log_file(logFile):
         logFile.close()

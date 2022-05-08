@@ -39,15 +39,15 @@ def generate_files_with_content():
         #create log file
         log_handler.create_log_file(bill_number)
         log = log_handler.open_log_file
-        log_handler.write(log, "Started generating txt bill for bill number: " + bill_number)
+        log_handler.log(bill_number, "Started generating txt bill for bill number: " + bill_number)
         create_txt_file(overview, origin, endcustomer, data)
-        log_handler.write(log, "Generated txt bill for bill number: " + bill_number)
+        log_handler.log(bill_number, "Generated txt bill for bill number: " + bill_number)
         
-        log_handler.write(log, "Started generating xml bill for bill number: " + bill_number)
+        log_handler.log(bill_number, "Started generating xml bill for bill number: " + bill_number)
         create_xml_file(overview, origin, endcustomer, data)
-        log_handler.write(log, "Generated xml bill for bill number: " + bill_number)
+        log_handler.log(bill_number, "Generated xml bill for bill number: " + bill_number)
         
-def create_txt_file(overview, origin, endcustomer, data, log_file):
+def create_txt_file(overview, origin, endcustomer, data):
 
         bill_name = overview[0]
         bill_number = bill_name.split("_")[1]
@@ -175,7 +175,7 @@ def create_txt_file(overview, origin, endcustomer, data, log_file):
         invoiceFileTxt.close()
         print("Invoice TXT created")
 
-def create_xml_file(overview, origin, endcustomer, data, log_file):
+def create_xml_file(overview, origin, endcustomer, data):
     
         bill_name = overview[0]
         bill_number = bill_name.split("_")[1]
