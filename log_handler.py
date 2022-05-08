@@ -3,7 +3,6 @@ import log_handler
 def create_log_file(file_name):
         #Create txt file
         filePathLogFile = "files/logs/" + str(file_name) +"_log.txt"
-        print("filePathTxtInvoice", filePathLogFile)
         logFile = open(filePathLogFile, "w")
         close_log_file(logFile)
         logFile.close()
@@ -11,7 +10,6 @@ def create_log_file(file_name):
 def open_log_file(filename):
         #Open txt file
         filePathLogFile = "files/logs/" + str(filename) +"_log.txt"
-        print("filePathTxtInvoice", filePathLogFile)
         logFile = open(filePathLogFile, "a")
         return logFile
 

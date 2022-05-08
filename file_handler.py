@@ -1,6 +1,7 @@
 # Read the filecontent of the .data file split by ; into variables and print those variables into the console and
 # save the different variables into a list
 import os
+import re
 import log_handler
 from datetime import datetime, timedelta
 
@@ -36,9 +37,21 @@ def generate_files_with_content():
         bill_name = overview[0]
         bill_number = bill_name.split("_")[1]
 
+        if bill_number == "": 
+            bill_number = file.replace(".data", "").replace("rechnung")
+        if bill_name == "": return print("No bill name found")
+        
+#       Check for false Entries
+        if len(overview) != 6: return log_handler.log(bill_number, 'Recieved corruped data. Overview has {} entries instad of 6'.format( len(overview)))#False Entry
+        if len(origin) != 8: log_handler.log(bill_number, 'Recieved corruped data. Origin has {} entries instad of 8'.format( len(origin)))#False Entry
+        if len(endcustomer) != 5: log_handler.log(bill_number, 'Recieved corruped data. Endcustomer has {} entries instad of 5'.format( len(endcustomer)))#False Entry
+        if len(data) == 0: log_handler.log(bill_number, 'Recieved corruped data. Overview has 0 entries')#False Entry
+        
+        for entry in data:
+            if len(entry) != 7: return log_handler.log(bill_number, 'Recieved corruped data. A data entry has {} entries instad of 7'.format( len(entry)))#False Entry
+        
         #create log file
         log_handler.create_log_file(bill_number)
-        log = log_handler.open_log_file
         log_handler.log(bill_number, "Started generating txt bill for bill number: " + bill_number)
         create_txt_file(overview, origin, endcustomer, data)
         log_handler.log(bill_number, "Generated txt bill for bill number: " + bill_number)
@@ -47,6 +60,10 @@ def generate_files_with_content():
         create_xml_file(overview, origin, endcustomer, data)
         log_handler.log(bill_number, "Generated xml bill for bill number: " + bill_number)
         
+        log_handler.log(bill_number, "Finished generating txt & xml bill for bill number: " + bill_number)
+    
+    return print("Finished generating all files")
+    
 def create_txt_file(overview, origin, endcustomer, data):
 
         bill_name = overview[0]
@@ -70,30 +87,9 @@ def create_txt_file(overview, origin, endcustomer, data):
         customer_name = endcustomer[2]
         customer_address = endcustomer[3]
         customer_postcode = endcustomer[4]
-        if debug:
-            print("Bill Name:\t" + bill_name)
-            print("Bill Number:\t" + bill_number)
-            print("Order Name:\t" + order_name)
-            print("Order Number:\t" + order_number)
-            print("Location:\t" + location)
-            print("Date:\t" + date)
-            print("Time:\t" + time)
-            print("Pay goal:\t" + pay_goal)
-
-            print("Origin number:\t" + origin_number)
-            print("Sender number:\t" + sender_number)
-            print("Origin name:\t" + origin_name)
-            print("Origin address:\t" + origin_address)
-            print("Origin postcode:\t" + origin_postcode)
-            print("Origin vat number:\t" + origin_vat_number)
-            print("Origin vat number:\t" + origin_vat_number)
-            print("Origin vat number:\t" + origin_vat_number)
-            print("Origin email:\t" + origin_email)
-
-            print("Receiver number:\t" + receiver_number)
-            print("Customer name:\t" + customer_name)
-            print("Customer address:\t" + customer_address)
-            print("Customer postcode:\t" + customer_postcode)
+        
+        #If debug send logs to console
+        log(debug, overview, origin, endcustomer, data)
         
         #Create txt file
         filePathTxtInvoice = "files/bill_txt/" + sender_number +"_"+ bill_number + "_invoice.txt"
@@ -135,18 +131,9 @@ def create_txt_file(overview, origin, endcustomer, data):
             full_amount = full_amount + float(end_sum)
             vat_num = float(remove_str(vat, "%"))
             vat_amount = vat_amount + vat_num * float(end_sum) / 100
-            if debug:
-                print("bill_pos:\t", bill_pos)
-                print("topic:\t\t", topic)
-                print("order_amount:\t", order_amount)
-                print("price:\t\t", price)
-                print("end_sum:\t", end_sum)
-                print("vat:\t\t", vat)
-                print("vat_num:\t\t", vat_num)
         #Generate Job Details
             invoiceFileTxt.write("  " + bill_pos + "\t\t" + topic + "\t\t\t" + order_amount + "\t\t" + price + "\t\t" + end_sum + "\t\t" + vat + "\n")
         
-        if debug: print(full_amount)
         full_sum = full_amount + vat_amount
         
         invoiceFileTxt.write("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t----------\n")
@@ -198,30 +185,9 @@ def create_xml_file(overview, origin, endcustomer, data):
         customer_name = endcustomer[2]
         customer_address = endcustomer[3]
         customer_postcode = endcustomer[4]
-        if debug:
-            print("Bill Name:\t" + bill_name)
-            print("Bill Number:\t" + bill_number)
-            print("Order Name:\t" + order_name)
-            print("Order Number:\t" + order_number)
-            print("Location:\t" + location)
-            print("Date:\t" + date)
-            print("Time:\t" + time)
-            print("Pay goal:\t" + pay_goal)
 
-            print("Origin number:\t" + origin_number)
-            print("Sender number:\t" + sender_number)
-            print("Origin name:\t" + origin_name)
-            print("Origin address:\t" + origin_address)
-            print("Origin postcode:\t" + origin_postcode)
-            print("Origin vat number:\t" + origin_vat_number)
-            print("Origin vat number:\t" + origin_vat_number)
-            print("Origin vat number:\t" + origin_vat_number)
-            print("Origin email:\t" + origin_email)
-
-            print("Receiver number:\t" + receiver_number)
-            print("Customer name:\t" + customer_name)
-            print("Customer address:\t" + customer_address)
-            print("Customer postcode:\t" + customer_postcode)
+        #If debug send logs to console
+        log(debug, overview, origin, endcustomer, data)
 
         filePathXmlInvoice = "files/bill_xml/" + sender_number +"_"+ bill_number + "_invoice.xml"
         invoiceFileXml = open(filePathXmlInvoice, "w")
@@ -245,12 +211,7 @@ def create_xml_file(overview, origin, endcustomer, data):
             full_amount = full_amount + float(end_sum)
             vat_num = float(remove_str(vat, "%"))
             vat_amount = vat_amount + vat_num * float(end_sum) / 100
-            if debug:
-                print("end_sum:\t", end_sum)
-                print("vat:\t\t", vat)
-                print("vat_num:\t\t", vat_num)
 
-        if debug: print(full_amount)
         full_sum = full_amount + vat_amount
         
         ################################################ XML ################################################
@@ -426,3 +387,77 @@ def get_long_amount(chf):
         correct_amount += "0"
         r = correct_amount+chf
     return r
+
+def log(debug, overview, origin, endcustomer, data):
+        bill_name = overview[0]
+        bill_number = bill_name.split("_")[1]
+        order_name = overview[1]
+        order_number = order_name.split("_")[1]
+        location = overview[2]
+        date = overview[3]
+        time = overview[4]
+        pay_goal = overview[5]
+
+        origin_number = origin[1]
+        sender_number = origin[2]
+        origin_name = origin[3]
+        origin_address = origin[4]
+        origin_postcode = origin[5]
+        origin_vat_number = origin[6]
+        origin_email = origin[7]
+
+        receiver_number = endcustomer[1]
+        customer_name = endcustomer[2]
+        customer_address = endcustomer[3]
+        customer_postcode = endcustomer[4]
+        if debug:
+            print("Bill Name:" + bill_name)
+            print("Bill Number:" + bill_number)
+            print("Order Name:" + order_name)
+            print("Order Number:" + order_number)
+            print("Location:" + location)
+            print("Date:" + date)
+            print("Time:" + time)
+            print("Pay goal:" + pay_goal)
+
+            print("Origin number:" + origin_number)
+            print("Sender number:" + sender_number)
+            print("Origin name:" + origin_name)
+            print("Origin address:" + origin_address)
+            print("Origin postcode:" + origin_postcode)
+            print("Origin vat number:" + origin_vat_number)
+            print("Origin vat number:" + origin_vat_number)
+            print("Origin vat number:" + origin_vat_number)
+            print("Origin email:" + origin_email)
+
+            print("Receiver number:" + receiver_number)
+            print("Customer name:" + customer_name)
+            print("Customer address:" + customer_address)
+            print("Customer postcode:" + customer_postcode)
+            
+            full_amount = 0
+            vat_amount = 0
+            
+            for d in data:
+                bill_pos = d[1]
+                topic = d[2]
+                order_amount = d[3]
+                price = d[4]
+                end_sum = d[5]
+                vat = remove_str(d[6], "MWST_")
+                full_amount = full_amount + float(end_sum)
+                vat_num = float(remove_str(vat, "%"))
+                vat_amount = vat_amount + vat_num * float(end_sum) / 100
+            
+
+                print("bill_pos:", bill_pos)
+                print("topic:", topic)
+                print("order_amount:", order_amount)
+                print("price:", price)
+                print("end_sum:", end_sum)
+                print("vat:", vat)
+                print("vat_num:", vat_num)
+                
+            full_sum = full_amount + vat_amount
+            print("full_sum", full_sum)
+            print("full_amount", full_amount)
