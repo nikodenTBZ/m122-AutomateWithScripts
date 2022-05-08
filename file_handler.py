@@ -38,20 +38,39 @@ def generate_files_with_content():
         bill_number = bill_name.split("_")[1]
 
         if bill_number == "": 
-            bill_number = file.replace(".data", "").replace("rechnung")
-        if bill_name == "": return print("No bill name found")
-        
-#       Check for false Entries
-        if len(overview) != 6: return log_handler.log(bill_number, 'Recieved corruped data. Overview has {} entries instad of 6'.format( len(overview)))#False Entry
-        if len(origin) != 8: log_handler.log(bill_number, 'Recieved corruped data. Origin has {} entries instad of 8'.format( len(origin)))#False Entry
-        if len(endcustomer) != 5: log_handler.log(bill_number, 'Recieved corruped data. Endcustomer has {} entries instad of 5'.format( len(endcustomer)))#False Entry
-        if len(data) == 0: log_handler.log(bill_number, 'Recieved corruped data. Overview has 0 entries')#False Entry
-        
-        for entry in data:
-            if len(entry) != 7: return log_handler.log(bill_number, 'Recieved corruped data. A data entry has {} entries instad of 7'.format( len(entry)))#False Entry
+            bill_number = file.replace(".data", "").replace("rechnung", "")
+        #if no bill number exists do what?
         
         #create log file
         log_handler.create_log_file(bill_number)
+        
+#       Check for false Entries
+        false_entries = False
+
+        if len(overview) != 6: 
+            log_handler.log(bill_number, 'Received corrupted data. Overview has {} entries instad of 6'.format( len(overview)))
+            false_entries = True;
+        if len(origin) != 8: 
+            log_handler.log(bill_number, 'Received corrupted data. Origin has {} entries instad of 8'.format( len(origin)))
+            false_entries = True;
+        if len(endcustomer) != 5:
+            log_handler.log(bill_number, 'Received corrupted data. Endcustomer has {} entries instad of 5'.format( len(endcustomer)))
+            false_entries = True;
+        if len(data) == 0: 
+            log_handler.log(bill_number, 'Received corrupted data. Overview has 0 entries')
+            false_entries = True;
+        
+        for entry in data:
+            if len(entry) != 7:
+                log_handler.log(bill_number, 'Received corrupted data. A data entry has {} entries instad of 7'.format( len(entry)))
+                false_entries = True;
+        
+        if false_entries:
+            continue;
+        
+        #If debug send logs to console
+        log(debug, overview, origin, endcustomer, data)
+        
         log_handler.log(bill_number, "Started generating txt bill for bill number: " + bill_number)
         create_txt_file(overview, origin, endcustomer, data)
         log_handler.log(bill_number, "Generated txt bill for bill number: " + bill_number)
@@ -87,9 +106,6 @@ def create_txt_file(overview, origin, endcustomer, data):
         customer_name = endcustomer[2]
         customer_address = endcustomer[3]
         customer_postcode = endcustomer[4]
-        
-        #If debug send logs to console
-        log(debug, overview, origin, endcustomer, data)
         
         #Create txt file
         filePathTxtInvoice = "files/bill_txt/" + sender_number +"_"+ bill_number + "_invoice.txt"
@@ -136,10 +152,10 @@ def create_txt_file(overview, origin, endcustomer, data):
         
         full_sum = full_amount + vat_amount
         
-        invoiceFileTxt.write("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t----------\n")
-        invoiceFileTxt.write("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tTotal CHF\t\t\t\t\t\t" + str(full_sum) + "\n")
+        invoiceFileTxt.write(t(20) + "----------\n")
+        invoiceFileTxt.write(t(20) + "Total CHF"+ t(6) + str(full_sum) + "\n")
         invoiceFileTxt.write("\n")
-        invoiceFileTxt.write("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tMWST  CHF\t\t\t\t\t\t" + str(vat_amount) + "\n")
+        invoiceFileTxt.write(t(20) + "MWST  CHF" + t(6) + str(vat_amount) + "\n")
         invoiceFileTxt.write("\n\n\n\n\n\n\n\n\n\n\n\n\n")
         
         #add payment goal +30 days
@@ -185,9 +201,6 @@ def create_xml_file(overview, origin, endcustomer, data):
         customer_name = endcustomer[2]
         customer_address = endcustomer[3]
         customer_postcode = endcustomer[4]
-
-        #If debug send logs to console
-        log(debug, overview, origin, endcustomer, data)
 
         filePathXmlInvoice = "files/bill_xml/" + sender_number +"_"+ bill_number + "_invoice.xml"
         invoiceFileXml = open(filePathXmlInvoice, "w")
