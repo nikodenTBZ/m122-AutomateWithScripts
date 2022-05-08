@@ -123,8 +123,8 @@ def create_txt_file(overview, origin, endcustomer, data):
         invoiceFileTxt.write("\n\n\n\n\n")
 
         invoiceFileTxt.write(location + ", den " + date + "\t\t\t"+ customer_name +"\n")
-        invoiceFileTxt.write("\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + customer_address + "\n")
-        invoiceFileTxt.write("\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + customer_postcode + "\n")
+        invoiceFileTxt.write(t(14) + customer_address + "\n")
+        invoiceFileTxt.write(t(14) + customer_postcode + "\n")
         invoiceFileTxt.write("\n")
 
         #Write Details
@@ -148,7 +148,7 @@ def create_txt_file(overview, origin, endcustomer, data):
             vat_num = float(remove_str(vat, "%"))
             vat_amount = vat_amount + vat_num * float(end_sum) / 100
         #Generate Job Details
-            invoiceFileTxt.write("  " + bill_pos + "\t\t" + topic + "\t\t\t" + order_amount + "\t\t" + price + "\t\t" + end_sum + "\t\t" + vat + "\n")
+            invoiceFileTxt.write("  " + bill_pos + t(2) + topic + t(3) + order_amount + t(2) + price + t(2) + end_sum + t(2) + vat + "\n")
         
         full_sum = full_amount + vat_amount
         
@@ -168,9 +168,9 @@ def create_txt_file(overview, origin, endcustomer, data):
         
         invoiceFileTxt.write("Einzahlungsschein")
         invoiceFileTxt.write("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")  
-        invoiceFileTxt.write("\t\t" + str(full_sum) + "\t\t\t\t\t\t\t\t\t\t\t\t" + str(full_sum) + "\t\t\t\t" + customer_name + "\n")  
-        invoiceFileTxt.write("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + customer_address + "\n")
-        invoiceFileTxt.write("0 00000 00000 00000\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + customer_postcode + "\n")
+        invoiceFileTxt.write(t(2) + str(full_sum) + t(12) + str(full_sum) + t(4) + customer_name + "\n")  
+        invoiceFileTxt.write(t(20) + customer_address + "\n")
+        invoiceFileTxt.write("0 00000 00000 00000" + t(16) + customer_postcode + "\n")
         invoiceFileTxt.write("\n")
         invoiceFileTxt.write(customer_name + "\n")
         invoiceFileTxt.write(customer_address + "\n")
