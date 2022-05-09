@@ -5,11 +5,11 @@ import re
 import log_handler
 from datetime import datetime, timedelta
 
+
 # debug = True
 debug = False
-
 def generate_files_with_content():
-    
+
     # loop through files/raw data
     for file in os.listdir("files/raw"):
 
@@ -36,25 +36,25 @@ def generate_files_with_content():
 
         bill_name = overview[0]
         bill_number = bill_name.split("_")[1]
+        order_name = overview[1]
+        order_number = order_name.split("_")[1]
+        origin_email = origin[7]
+        origin_name = origin[3]
 
-        if bill_number == "": 
-            bill_number = file.replace(".data", "").replace("rechnung", "")
-        #if no bill number exists do what?
-        
         #create log file
         log_handler.create_log_file(bill_number)
-        
+        log_handler.log(bill_number, f"{order_number} {bill_number} {origin_name} {origin_email}")
 #       Check for false Entries
         false_entries = False
 
         if len(overview) != 6: 
-            log_handler.log(bill_number, 'Received corrupted data. Overview has {} entries instad of 6'.format( len(overview)))
+            log_handler.log(bill_number, 'Received corrupted data. Overview has {} entries instead of 6'.format( len(overview)))
             false_entries = True;
         if len(origin) != 8: 
-            log_handler.log(bill_number, 'Received corrupted data. Origin has {} entries instad of 8'.format( len(origin)))
+            log_handler.log(bill_number, 'Received corrupted data. Origin has {} entries instead of 8'.format( len(origin)))
             false_entries = True;
         if len(endcustomer) != 5:
-            log_handler.log(bill_number, 'Received corrupted data. Endcustomer has {} entries instad of 5'.format( len(endcustomer)))
+            log_handler.log(bill_number, 'Received corrupted data. Endcustomer has {} entries instead of 5'.format( len(endcustomer)))
             false_entries = True;
         if len(data) == 0: 
             log_handler.log(bill_number, 'Received corrupted data. Overview has 0 entries')
@@ -62,11 +62,11 @@ def generate_files_with_content():
         
         for entry in data:
             if len(entry) != 7:
-                log_handler.log(bill_number, 'Received corrupted data. A data entry has {} entries instad of 7'.format( len(entry)))
+                log_handler.log(bill_number, 'Received corrupted data. A data entry has {} entries instead of 7'.format( len(entry)))
                 false_entries = True;
         
         if false_entries:
-            continue;
+            continue
         
         #If debug send logs to console
         log(debug, overview, origin, endcustomer, data)
@@ -80,7 +80,9 @@ def generate_files_with_content():
         log_handler.log(bill_number, "Generated xml bill for bill number: " + bill_number)
         
         log_handler.log(bill_number, "Finished generating txt & xml bill for bill number: " + bill_number)
-    
+
+        #delete local file
+        os.remove(f"files/raw/{file}")
     return print("Finished generating all files")
     
 def create_txt_file(overview, origin, endcustomer, data):
@@ -474,3 +476,15 @@ def log(debug, overview, origin, endcustomer, data):
             full_sum = full_amount + vat_amount
             print("full_sum", full_sum)
             print("full_amount", full_amount)
+
+
+def delete_files():
+    # loop through files_to_upload folder and upload each file
+    for directory in os.listdir("files"):
+        # check if directory is bill_txt or bill_xml
+        if directory != ".DS_Store" and directory != "logs":
+            for file in os.listdir(f"files/{directory}"):
+                print("Deleting: " + file)
+                os.remove(f"files/{directory}/{file}")
+
+
